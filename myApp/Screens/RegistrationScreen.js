@@ -20,10 +20,10 @@ export default function RegistrationScreen() {
       style={styles.image}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View
-          style={{ ...styles.form, paddingBottom: isShowKeyboard ? 116 : 78 }}
+          style={{ ...styles.form, paddingBottom: isShowKeyboard ? 115 : 66 }}
         >
           <View style={styles.avatar}>
             <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.8}>
@@ -35,6 +35,7 @@ export default function RegistrationScreen() {
           </View>
           <Text style={styles.formTitle}>Реєстрація</Text>
           <TextInput
+            onFocus={() => setIsShowKeyboard(true)}
             style={styles.input}
             placeholder="Логін"
             placeholderTextColor={"#bdbdbd"}
@@ -46,6 +47,7 @@ export default function RegistrationScreen() {
             placeholderTextColor={"#bdbdbd"}
           />
           <TextInput
+            onFocus={() => setIsShowKeyboard(true)}
             style={styles.input}
             placeholder="Пароль"
             placeholderTextColor={"#bdbdbd"}
@@ -68,7 +70,6 @@ export default function RegistrationScreen() {
 const styles = StyleSheet.create({
   image: {
     flex: 1,
-    // alignItems: "center",
     justifyContent: "flex-end",
   },
   form: {
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     height: 120,
     left: "50%",
     top: -60,
-    transform: "translate(-50%, 0)",
+    // transform: "translate(-50%, 0)",
 
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
@@ -95,12 +96,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     bottom: 14,
-    transform: "translate(50%, 0)",
+    // transform: "translate(50%, 0)",
     zIndex: 1000,
     width: 25,
     height: 25,
     borderWidth: 1,
-    borderRadius: "50%",
+    borderRadius: 100,
     borderColor: "#FF6C00",
     backgroundColor: "#FFFFFF",
   },
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     marginTop: 76,
     marginBottom: 33,
     textAlign: "center",
-    fontWeight: 500,
+    // fontWeight: 500,
     fontSize: 30,
     lineHeight: 35,
     // letterSpacing: "0.01em",
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#e8e8e8",
     backgroundColor: "#f6f6f6",
-    fontWeight: 400,
+    // fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
     color: "#212121",
@@ -148,14 +149,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
   },
   btnTitle: {
-    fontWeight: 400,
+    // fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
     color: "#FFFFFF",
   },
   linkToLogin: {
     textAlign: "center",
-    fontWeight: 400,
+    // fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
     color: "#1B4371",

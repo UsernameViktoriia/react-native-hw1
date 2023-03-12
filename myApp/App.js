@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import RegistrationScreen from "./screens/RegistrationScreen";
+import RegistrationScreen from "./Screens/RegistrationScreen";
 
 export default function App() {
   return (
