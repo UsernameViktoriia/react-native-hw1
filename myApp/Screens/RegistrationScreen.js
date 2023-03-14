@@ -2,74 +2,164 @@ import React, { useState } from "react";
 import {
   Image,
   ImageBackground,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 
+const initialState = {
+  login: "",
+  email: "",
+  password: "",
+};
+
 export default function RegistrationScreen() {
+  const [state, setState] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [hidePass, setHidePass] = useState(true);
+  const [active, setIsActive] = useState({
+    login: false,
+    email: false,
+    password: false,
+  });
+
   return (
-    <ImageBackground
-      source={require("../assets/images/photo_BG.jpg")}
-      style={styles.image}
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
     >
-      <KeyboardAvoidingView
-      // behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <ImageBackground
+        source={require("../assets/images/photo_BG.jpg")}
+        style={styles.image}
       >
-        <View
-          style={{ ...styles.form, paddingBottom: isShowKeyboard ? 115 : 66 }}
-        >
-          <View style={styles.avatar}>
-            <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.8}>
-              <Image
-                style={styles.addAvatarIcon}
-                source={require("../assets/images/addAvatarIcon.png")}
-              ></Image>
-            </TouchableOpacity>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
+          <View
+            style={{ ...styles.form, paddingBottom: isShowKeyboard ? 16 : 78 }}
+          >
+            <View style={styles.avatar}>
+              <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.8}>
+                <Image
+                  style={styles.addAvatarIcon}
+                  source={require("../assets/images/addAvatarIcon.png")}
+                ></Image>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.formTitle}>Реєстрація</Text>
+            <TextInput
+              onFocus={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  login: true,
+                }));
+                setIsShowKeyboard(true);
+              }}
+              onBlur={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  login: false,
+                }));
+                setIsShowKeyboard(false);
+              }}
+              value={state.login}
+              onChangeText={(value) =>
+                setState((prevState) => ({ ...prevState, login: value }))
+              }
+              style={{
+                ...styles.input,
+                borderColor: active.login ? "#FF6C00" : "#E8E8E8",
+              }}
+              placeholder="Логін"
+              placeholderTextColor={"#bdbdbd"}
+            />
+            <TextInput
+              onFocus={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  email: true,
+                }));
+                setIsShowKeyboard(true);
+              }}
+              onBlur={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  email: false,
+                }));
+                setIsShowKeyboard(false);
+              }}
+              value={state.email}
+              onChangeText={(value) =>
+                setState((prevState) => ({ ...prevState, email: value }))
+              }
+              style={{
+                ...styles.input,
+                borderColor: active.email ? "#FF6C00" : "#E8E8E8",
+              }}
+              placeholder="Адреса електронної пошти"
+              placeholderTextColor={"#bdbdbd"}
+            />
+            <TextInput
+              onFocus={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  password: true,
+                }));
+                setIsShowKeyboard(true);
+              }}
+              onBlur={() => {
+                setIsActive((prevState) => ({
+                  ...prevState,
+                  password: false,
+                }));
+                setIsShowKeyboard(false);
+              }}
+              secureTextEntry={hidePass}
+              value={state.password}
+              onChangeText={(value) =>
+                setState((prevState) => ({ ...prevState, password: value }))
+              }
+              style={{
+                ...styles.input,
+                borderColor: active.password ? "#FF6C00" : "#E8E8E8",
+              }}
+              placeholder="Пароль"
+              placeholderTextColor={"#bdbdbd"}
+            />
+            <Text style={styles.show} onPress={() => setHidePass(!hidePass)}>
+              {!hidePass ? "Сховати" : "Показати"}
+            </Text>
+            <View style={{ display: isShowKeyboard ? "none" : "flex" }}>
+              <TouchableOpacity
+                style={styles.button}
+                activeOpacity={0.8}
+                onPress={() => {
+                  console.log(state);
+                  setState(initialState);
+                }}
+              >
+                <Text style={styles.btnTitle}>Зареєструватися</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.8}>
+                <Text style={styles.linkToLogin}>Вже маєте акаунт? Увійти</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.formTitle}>Реєстрація</Text>
-          <TextInput
-            onFocus={() => setIsShowKeyboard(true)}
-            style={styles.input}
-            placeholder="Логін"
-            placeholderTextColor={"#bdbdbd"}
-          />
-          <TextInput
-            onFocus={() => setIsShowKeyboard(true)}
-            style={styles.input}
-            placeholder="Адреса електронної пошти"
-            placeholderTextColor={"#bdbdbd"}
-          />
-          <TextInput
-            onFocus={() => setIsShowKeyboard(true)}
-            style={styles.input}
-            placeholder="Пароль"
-            placeholderTextColor={"#bdbdbd"}
-          />
-          <Text style={styles.show} onPress={() => setHidePass(!hidePass)}>
-            {!hidePass ? "Сховати" : "Показати"}
-          </Text>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-            <Text style={styles.btnTitle}>Зареєструватися</Text>
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.8}>
-            <Text style={styles.linkToLogin}>Вже маєте акаунт? Увійти</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   image: {
     flex: 1,
+    resizeMode: "cover",
     justifyContent: "flex-end",
   },
   form: {
@@ -85,8 +175,7 @@ const styles = StyleSheet.create({
     height: 120,
     left: "50%",
     top: -60,
-    // transform: "translate(-50%, 0)",
-
+    transform: [{ translateX: -50 }],
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
   },
@@ -96,7 +185,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     bottom: 14,
-    // transform: "translate(50%, 0)",
+    transform: [{ translateX: 12 }],
     zIndex: 1000,
     width: 25,
     height: 25,
@@ -114,6 +203,7 @@ const styles = StyleSheet.create({
     marginBottom: 33,
     textAlign: "center",
     // fontWeight: 500,
+    fontFamily: "Roboto-Medium",
     fontSize: 30,
     lineHeight: 35,
     // letterSpacing: "0.01em",
@@ -128,6 +218,7 @@ const styles = StyleSheet.create({
     borderColor: "#e8e8e8",
     backgroundColor: "#f6f6f6",
     // fontWeight: 400,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
     color: "#212121",
@@ -136,6 +227,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 32,
     top: 308,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
     color: "#1B4371",
@@ -150,6 +242,7 @@ const styles = StyleSheet.create({
   },
   btnTitle: {
     // fontWeight: 400,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
     color: "#FFFFFF",
@@ -157,6 +250,7 @@ const styles = StyleSheet.create({
   linkToLogin: {
     textAlign: "center",
     // fontWeight: 400,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
     color: "#1B4371",
