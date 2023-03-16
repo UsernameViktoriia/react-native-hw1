@@ -17,7 +17,7 @@ const initialState = {
   password: "",
 };
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [state, setState] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [hidePass, setHidePass] = useState(true);
@@ -33,7 +33,7 @@ export default function LoginScreen() {
       }}
     >
       <ImageBackground
-        source={require("../assets/images/photo_BG.jpg")}
+        source={require("../../assets/images/photo_BG.jpg")}
         style={styles.image}
       >
         <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
@@ -108,13 +108,17 @@ export default function LoginScreen() {
                 onPress={() => {
                   console.log(state);
                   setState(initialState);
+                  navigation.navigate("Home");
                 }}
               >
                 <Text style={{ ...styles.btnTitle }}>Увійти</Text>
               </TouchableOpacity>
 
               <TouchableOpacity activeOpacity={0.8}>
-                <Text style={styles.linkToRegistration}>
+                <Text
+                  style={styles.linkToRegistration}
+                  onPress={() => navigation.navigate("Register")}
+                >
                   Не маєте акаунт? Зареєструватись
                 </Text>
               </TouchableOpacity>
@@ -127,28 +131,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  //   container: {
-  //     position: "absolute",
-  //     bottom: 0,
-  //     paddingLeft: 16,
-  //     paddingRight: 16,
-
-  //     backgroundColor: "#fff",
-  //     width: "100 %",
-  //     justifyContent: "flex-end",
-  //     paddingBottom: 30,
-  //     borderTopLeftRadius: 25,
-  //     borderTopRightRadius: 25,
-  //   },
-
-  //   textShow: {
-  //     color: "#000",
-  //     position: "absolute",
-  //     top: 13,
-  //     right: 25,
-  //     fontSize: 16,
-  //     color: "#1B4371",
-  //   },
   image: {
     flex: 1,
     resizeMode: "cover",

@@ -19,7 +19,8 @@ const initialState = {
   password: "",
 };
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
+  console.log("navigation", navigation);
   const [state, setState] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [hidePass, setHidePass] = useState(true);
@@ -36,7 +37,7 @@ export default function RegistrationScreen() {
       }}
     >
       <ImageBackground
-        source={require("../assets/images/photo_BG.jpg")}
+        source={require("../../assets/images/photo_BG.jpg")}
         style={styles.image}
       >
         <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
@@ -47,7 +48,7 @@ export default function RegistrationScreen() {
               <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.8}>
                 <Image
                   style={styles.addAvatarIcon}
-                  source={require("../assets/images/addAvatarIcon.png")}
+                  source={require("../../assets/images/addAvatarIcon.png")}
                 ></Image>
               </TouchableOpacity>
             </View>
@@ -141,12 +142,18 @@ export default function RegistrationScreen() {
                 onPress={() => {
                   console.log(state);
                   setState(initialState);
+                  navigation.navigate("Home");
                 }}
               >
                 <Text style={styles.btnTitle}>Зареєструватися</Text>
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={0.8}>
-                <Text style={styles.linkToLogin}>Вже маєте акаунт? Увійти</Text>
+                <Text
+                  style={styles.linkToLogin}
+                  onPress={() => navigation.navigate("Login")}
+                >
+                  Вже маєте акаунт? Увійти
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
