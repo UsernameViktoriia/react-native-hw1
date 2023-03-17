@@ -5,7 +5,7 @@ import {
   updateProfile,
   onAuthStateChanged,
 } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth } from "../../firebase/config";
 import { authSlice } from "./authReducer";
 
 export const authSignUpUser = async ({ email, password, login }) => {

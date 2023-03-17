@@ -19,7 +19,7 @@ import {
   updateDoc,
   onSnapshot,
 } from "firebase/firestore";
-import { pathSlice } from "../../redux/pathReducer";
+import { pathSlice } from "../../redux/auth/pathReducer";
 import { db } from "../../firebase/config";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 
