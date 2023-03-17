@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import {
   Image,
   ImageBackground,
@@ -12,6 +13,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase/config";
+import Svg, { Circle, Path } from "react-native-svg";
+
+import { authSignUpUser, updateAvatar } from "../../redux/auth/authOperations";
+import { authSlice } from "../../redux/auth/authReducer";
 
 const initialState = {
   login: "",
@@ -20,7 +28,7 @@ const initialState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-  console.log("navigation", navigation);
+  const [avatar, setAvatar] = useState(null);
   const [state, setState] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [hidePass, setHidePass] = useState(true);
@@ -29,6 +37,56 @@ export default function RegistrationScreen({ navigation }) {
     email: false,
     password: false,
   });
+
+  const dispatch = useDispatch();
+
+  const uploadPhotoToServer = async (avatarId) => {
+    try {
+      const response = await fetch(avatar);
+      const file = await response.blob();
+      const storageRef = ref(storage, `avatars/${avatarId}`);
+      await uploadBytes(storageRef, file);
+      const path = await getDownloadURL(ref(storage, `avatars/${avatarId}`));
+      setAvatar(path);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setAvatar(result.uri);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const updatedUser = await authSignUpUser({
+        email: state.email,
+        password: state.password,
+        login: state.login,
+      });
+      await uploadPhotoToServer(updatedUser.uid);
+      dispatch(updateAvatar(avatar));
+      dispatch(
+        authSlice.actions.updateProfile({
+          userId: updatedUser.uid,
+          login: updatedUser.displayName,
+          email: updatedUser.email,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    setState(initialState);
+  };
 
   return (
     <TouchableWithoutFeedback
@@ -45,11 +103,32 @@ export default function RegistrationScreen({ navigation }) {
             style={{ ...styles.form, paddingBottom: isShowKeyboard ? 16 : 78 }}
           >
             <View style={styles.avatar}>
-              <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.8}>
-                <Image
-                  style={styles.addAvatarIcon}
-                  source={require("../../assets/images/addAvatarIcon.png")}
-                ></Image>
+              <Image
+                style={{ height: "100%", width: "100%", borderRadius: 16 }}
+                source={{ uri: avatar }}
+              />
+              <TouchableOpacity style={styles.btnAddAvatar} onPress={pickImage}>
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="none"
+                  viewBox="0 0 25 25"
+                >
+                  <Circle
+                    cx="12.5"
+                    cy="12.5"
+                    r="12"
+                    fill="none"
+                    stroke="#BDBDBD"
+                  ></Circle>
+                  <Path
+                    fill="#BDBDBD"
+                    fillRule="evenodd"
+                    d="M13 6h-1v6H6v1h6v6h1v-6h6v-1h-6V6z"
+                    clipRule="evenodd"
+                  ></Path>
+                </Svg>
               </TouchableOpacity>
             </View>
             <Text style={styles.formTitle}>Реєстрація</Text>
@@ -139,11 +218,7 @@ export default function RegistrationScreen({ navigation }) {
               <TouchableOpacity
                 style={styles.button}
                 activeOpacity={0.8}
-                onPress={() => {
-                  console.log(state);
-                  setState(initialState);
-                  navigation.navigate("Home");
-                }}
+                onPress={handleSubmit}
               >
                 <Text style={styles.btnTitle}>Зареєструватися</Text>
               </TouchableOpacity>
@@ -187,23 +262,20 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   btnAddAvatar: {
-    alignItems: "center",
-    justifyContent: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
     position: "absolute",
     right: 0,
+    // right: -13,
     bottom: 14,
-    transform: [{ translateX: 12 }],
-    zIndex: 1000,
-    width: 25,
-    height: 25,
-    borderWidth: 1,
-    borderRadius: 100,
-    borderColor: "#FF6C00",
-    backgroundColor: "#FFFFFF",
-  },
-  addAvatarIcon: {
-    width: 13,
-    height: 13,
+    // transform: [{ translateX: 12 }],
+    // zIndex: 1000,
+    // width: 25,
+    // height: 25,
+    // borderWidth: 1,
+    // borderRadius: 100,
+    // borderColor: "#FF6C00",
+    // backgroundColor: "#FFFFFF",
   },
   formTitle: {
     marginTop: 76,

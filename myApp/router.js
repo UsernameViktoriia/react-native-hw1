@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import RegistrationScreen from "./Screens/auth/RegistrationScreen";
@@ -10,11 +9,20 @@ import Home from "./Screens/main/Home";
 import CommentsScreen from "./Screens/nested/CommentsScreen";
 import MapScreen from "./Screens/nested/MapScreen";
 
+import { useDispatch, useSelector } from "react-redux";
+import { authStateChangeUser } from "./redux/auth/authOperations";
+
 const Stack = createStackNavigator();
 const NestedStack = createNativeStackNavigator();
 
-export const useRoute = (isAuth) => {
-  if (!isAuth) {
+export const useRoute = () => {
+  const { state } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(authStateChangeUser());
+  }, [state]);
+
+  if (!state) {
     return (
       <Stack.Navigator>
         <Stack.Screen

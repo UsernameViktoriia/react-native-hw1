@@ -12,6 +12,9 @@ import {
   Platform,
 } from "react-native";
 
+import { authSignInUser } from "../../redux/auth/authOperations";
+import { useDispatch } from "react-redux";
+
 const initialState = {
   email: "",
   password: "",
@@ -25,6 +28,12 @@ export default function LoginScreen({ navigation }) {
     email: false,
     password: false,
   });
+
+  const dispatch = useDispatch();
+
+  const handleSubmit = () => {
+    dispatch(authSignInUser({ email: state.email, password: state.password }));
+  };
 
   return (
     <TouchableWithoutFeedback
@@ -105,11 +114,7 @@ export default function LoginScreen({ navigation }) {
                   ...styles.btnSubmit,
                 }}
                 activeOpacity={0.8}
-                onPress={() => {
-                  console.log(state);
-                  setState(initialState);
-                  navigation.navigate("Home");
-                }}
+                onPress={handleSubmit}
               >
                 <Text style={{ ...styles.btnTitle }}>Увійти</Text>
               </TouchableOpacity>

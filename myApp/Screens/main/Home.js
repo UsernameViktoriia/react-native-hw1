@@ -1,9 +1,11 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useDispatch } from "react-redux";
 
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 
@@ -11,6 +13,8 @@ const MainTab = createBottomTabNavigator();
 
 export default function Home({ navigation }) {
   console.log("navigation", navigation);
+  const dispatch = useDispatch();
+
   return (
     <MainTab.Navigator tabBarOptions={{ showLabel: false }}>
       <MainTab.Screen
@@ -28,6 +32,7 @@ export default function Home({ navigation }) {
               size={24}
               color="#212121"
               style={{ marginRight: 20 }}
+              onPress={() => dispatch(authSignOutUser())}
             />
           ),
         }}

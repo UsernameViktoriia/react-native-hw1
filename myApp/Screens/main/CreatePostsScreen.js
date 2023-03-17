@@ -8,19 +8,29 @@ import {
   Keyboard,
   Image,
   View,
-  Platform,
 } from "react-native";
+import { storage, db } from "../../firebase/config";
+import { collection, addDoc } from "firebase/firestore";
+import { useSelector } from "react-redux";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import uuid from "react-native-uuid";
+import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import { Camera } from "expo-camera";
 import { MaterialIcons, AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function CreatePostsScreen({ navigation }) {
+  const [hasPermission, setHasPermission] = useState(null);
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [camera, setCamera] = useState(null);
   const [photo, setPhoto] = useState();
   const [location, setLocation] = useState(null);
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { userId, login } = useSelector((state) => state.auth);
 
   useEffect(() => {
     (async () => {
@@ -39,12 +49,83 @@ export default function CreatePostsScreen({ navigation }) {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+      await Camera.getCameraPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   const takePhoto = async () => {
-    const photo = await camera.takePictureAsync();
-    setPhoto(photo.uri);
-    const location = await Location.getCurrentPositionAsync();
-    setLocation(location);
-    console.log("location", location);
+    try {
+      const photo = await camera.takePictureAsync();
+      setPhoto(photo.uri);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const uploadPhotoToServer = async () => {
+    try {
+      const postId = uuid.v4().split("-").join("");
+
+      const response = await fetch(photo);
+      const file = await response.blob();
+
+      const storageRef = await ref(storage, `posts/${postId}`);
+
+      await uploadBytesResumable(storageRef, file);
+
+      const photo = await getDownloadURL(storageRef);
+
+      const location = await Location.getCurrentPositionAsync({});
+
+      return { photo, location };
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const createPost = async () => {
+    try {
+      const { photo, location } = await uploadPhotoToServer();
+      await addDoc(collection(db, "posts"), {
+        photo,
+        name: title,
+        place,
+        location,
+        userId,
+        login,
+        comments: 0,
+        likes: [],
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
+
+  const uploadPhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setPhoto(result.uri);
+    }
   };
 
   const reset = () => {
@@ -53,9 +134,16 @@ export default function CreatePostsScreen({ navigation }) {
     setPlace("");
   };
 
-  const onSubmit = () => {
-    navigation.navigate("Публікації", { photo, location, title, place });
-    reset();
+  const onSubmit = async () => {
+    try {
+      reset();
+      await createPost();
+      reset();
+      setLoading(false);
+      navigation.navigate("Публікації");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -87,9 +175,13 @@ export default function CreatePostsScreen({ navigation }) {
           )}
         </Camera>
         {photo ? (
-          <Text style={styles.textInPhoto}>Редагувати фото</Text>
+          <Text style={styles.textInPhoto} onPress={() => console.log("ok")}>
+            Редагувати фото
+          </Text>
         ) : (
-          <Text style={styles.textInPhoto}>Завантажте фото</Text>
+          <TouchableOpacity onPress={() => uploadPhoto()}>
+            <Text style={styles.textInPhoto}>Завантажте фото</Text>
+          </TouchableOpacity>
         )}
         <View style={styles.place}>
           <TextInput
